@@ -27,15 +27,18 @@ def makedb():
     ''')
     cursor.close()
 
-def InsertList():
+def InsertList(name,title):
     #テーブルに挿入
-    connection = sqlite3.connect('booklist.db')
-    cursor = connection.cursor()
-    sql = "INSERT INTO booklist(foo,bar) VALUES(?,?);"
-    fact = [u"セルバンテス",u"ドン・キホーテ"]
-    cursor.execute(sql,fact)
-    connection.commit()
-    cursor.close()
+    try:
+        connection = sqlite3.connect('booklist.db')
+        cursor = connection.cursor()
+        sql = "INSERT INTO booklist(foo,bar) VALUES(?,?);"
+        fact = [name.decode('utf-8'),title.decode('utf-8')]
+        cursor.execute(sql,fact)
+        connection.commit()
+        cursor.close()
+    except:
+        print'挿入できないエラーだにょ～'
 def SelectListALL():
     #テーブルから読み込み
     connection = sqlite3.connect('booklist.db')
@@ -46,38 +49,53 @@ def SelectListALL():
     for i in da:
         print("%d"%i[0])+' '+("%s"%i[1].encode('utf-8'))+'「'+("%s"%i[2].encode('utf-8'))+'」' #foo
     cursor.close()
+def DeleteList(dlt):
+    connection = sqlite3.connect('booklist.db')
+    cursor = connection.cursor()
+    sql = "DELETE from booklist where id=?;"
+    try:
+        cursor.execute(sql,[dlt,])
+        connection.commit()
+        cursor.close()
+    except:
+        print'削除できないエラーだにょ～'
+    SelectListALL()
+
 #-----------------------------ここからmainのとこ------------------------------------#
 
 if __name__ == "__main__":
+    while True:
+        print'読みたい本リスト閲覧:1\n本の登録:2\n本の削除:3\nバックスラッシュを変換:4\n終了:10\n'
+        print'数字を選択'
+        num=raw_input('-->')
+        if num=='1':
+            #makedb()
+            SelectListALL()
+        elif num=='2':
+            while True:
+                end=1
+                print'読みたい本リスト'
+                while True:
+                    name=raw_input('作者-->')
+                    title=raw_input('題名-->')
+                    end=raw_input('決定:1 変更:2-->')
+                    if end=='1':break
+                #print type(name)
+                InsertList(name,title)
+                SelectListALL()
+                end =raw_input('続けて入力？:1\n終わる:2\n-->')
+                if end=='2':break
 
-    print'読みたい本リスト閲覧:1\n本の登録:2\nバックスラッシュを変換:3\nデータベースから呼び出し:4\n'
-    print'数字を選択'
-    num=raw_input('-->')
-#    print'お前は「'+num+'」を選んだな！'
-#    print type(num)
-
-booklist=[['ガルシア・マルケス','百年の孤独'],
-          ['ジャン・ポール・サルトル','嘔吐'],
-          ['セルバンテス','ドン・キホーテ']]
-
-if num=='1':
-    #makedb()
-    #InsertList()
-    SelectListALL()
-elif num=='2':
-    print'読みたい本リスト'
-    book=[]
-    book.append(raw_input('作者-->'))
-    book.append(raw_input('題名-->'))
-    booklist.append(book)
-    plist(booklist)
-
-elif num=='3':
-    #C:\Users\1X12C024\Desktop\AgentSimulation\test1-1\booklist
-    #C:/Users/1X12C024/Desktop/AgentSimulation/test1-1/booklist
-    mo=raw_input('-->')
-    mi=''
-    print bksr(mi, mo)
-
-else:
-    print'指定した数字をうちこめオマンコ野郎！'
+        elif num=='3':
+            SelectListALL()
+            dlt=raw_input('削除する本の番号-->')
+            DeleteList(dlt)
+        elif num=='4':
+            #C:\Users\1X12C024\Desktop\AgentSimulation\test1-1\booklist
+            #C:/Users/1X12C024/Desktop/AgentSimulation/test1-1/booklist
+            mo=raw_input('-->')
+            mi=''
+            print bksr(mi, mo)
+        elif num=='10':break
+        else:
+            print'指定した数字をうちこめ！'
